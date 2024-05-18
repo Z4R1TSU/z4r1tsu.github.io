@@ -1,7 +1,7 @@
 import type { Site, SocialObjects, OG_Type } from "./types";
 
 export const SITE: Site = {
-  website: "https://z4r1tsu.github.io/",
+  website: "https://z4r1tsu.github.io/web/",
   author: "Zari Tsu",
   desc: "Zari Tsu's blog",
   title: "Zari Tsu",
