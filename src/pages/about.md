@@ -10,10 +10,7 @@ title: "关于我/关于本站"
 * 热爱编程 乐于折腾 尝试开源
 * 对审美有要求 对自己有目标
 
-<br>
-<br>
-
-如果你也想构建一个像这样的网站，那么这些可供参考：
+本网站使用如下技术构建（如果你也想构建一个像这样的网站）：
 
 - [Astro](https://astro.build/)
 - [TailwindCSS](https://tailwindcss.com/)
