@@ -10,7 +10,8 @@ import mdx from "@astrojs/mdx";
 export default defineConfig({
   site: SITE.website,
   image: {
-    domains: ["bucket.liruifengv.com"]
+    site: 'https://z4r1tsu.github.io',
+    base: '/web',
   },
   integrations: [
     tailwind(), 
