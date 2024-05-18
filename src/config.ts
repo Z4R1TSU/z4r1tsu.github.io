@@ -22,20 +22,20 @@ export const LOGO_IMAGE = {
 export const SOCIALS: SocialObjects = [
   {
     name: "Github",
-    href: "https://github.com/liruifengv",
-    linkTitle: `liruifengv's Github`,
+    href: "https://github.com/Z4R1TSU",
+    linkTitle: `Zari Tsu's Github`,
     active: true,
   },
   {
     name: "Mail",
-    href: "mailto:liruifeng1024@gmail.com",
-    linkTitle: `Send an email to liruifengv`,
+    href: "mailto:zaritsu030907@gmail.com",
+    linkTitle: `Send an email to Zari Tsu`,
     active: true,
   },
   {
-    name: "Twitter",
-    href: "https://twitter.com/liruifengv",
-    linkTitle: `liruifengv's Twitter`,
+    name: "BiliBili",
+    href: "https://space.bilibili.com/527080131",
+    linkTitle: `https://space.bilibili.com/527080131`,
     active: true,
   },
 ];
