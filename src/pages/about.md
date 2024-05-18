@@ -5,7 +5,12 @@ title: "关于我/关于本站"
 
 ## 我是 Zari Tsu
 
-本网站使用如下技术构建：
+* 03年生人
+* 籍贯浙江慈溪 大学就读广州
+* 热爱编程 乐于折腾 尝试开源
+* 对审美有要求 对自己有目标
+
+本网站使用如下技术构建（如果你也想构建一个像这样的网站）：
 
 - [Astro](https://astro.build/)
 - [TailwindCSS](https://tailwindcss.com/)
