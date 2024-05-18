@@ -8,11 +8,8 @@ import mdx from "@astrojs/mdx";
 
 // https://astro.build/config
 export default defineConfig({
-  site: SITE.website,
-  image: {
-    site: 'https://z4r1tsu.github.io',
-    base: '/web',
-  },
+  site: 'https://z4r1tsu.github.io',
+  base: '/',
   integrations: [
     tailwind(), 
     react(),
