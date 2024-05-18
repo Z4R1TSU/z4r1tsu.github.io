@@ -4,7 +4,7 @@ const posts = defineCollection({
   type: "content",
   schema: ({ image }) =>
     z.object({
-      author: z.string().default("liruifengv"),
+      author: z.string().default("ZariTsu"),
       pubDatetime: z.date(),
       title: z.string(),
       featured: z.boolean().optional(),
