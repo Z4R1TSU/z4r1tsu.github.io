@@ -45,7 +45,7 @@ const Comments = () => {
       {mounted ? (
         <Giscus
           id={id}
-          repo="liruifengv/liruifengv.com"
+          repo="Z4R1TSU/web"
           repoId="R_kgDOKeudTw"
           category="Announcements"
           categoryId="DIC_kwDOKeudT84Cch4W"
