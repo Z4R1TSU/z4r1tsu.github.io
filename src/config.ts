@@ -2,9 +2,9 @@ import type { Site, SocialObjects, OG_Type } from "./types";
 
 export const SITE: Site = {
   website: "https://liruifengv.com/",
-  author: "liruifengv",
-  desc: "liruifengv's blog",
-  title: "liruifengv",
+  author: "Zari Tsu",
+  desc: "Zari Tsu's blog",
+  title: "Zari Tsu",
   lightAndDarkMode: true,
   postPerPage: 10,
   avatar: "https://bucket.liruifengv.com/avatar.jpg",
