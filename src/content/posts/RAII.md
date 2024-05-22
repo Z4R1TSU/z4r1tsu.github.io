@@ -7,6 +7,7 @@ featured: false
 draft: false
 tags:
   - cpp
+  - multithreading
 ---
 
 # RAII和智能指针
