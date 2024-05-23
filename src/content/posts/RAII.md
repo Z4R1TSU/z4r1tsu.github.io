@@ -112,6 +112,10 @@ A: 有可能死锁，不符合RAII规范。具体表现是，如果在`acquire l
 
 ### shared_ptr和weak_ptr
 
+> 定义对象的时候，用强智能指针；引用对象的地方，用弱智能指针。  
+
+> shared_ptr: 定义对象   weak_ptr: 引用对象
+
 shared_ptr: 
 
 1. `shared_ptr`通过一个引用计数共享一个对象(需要额外的开销)。
