@@ -23,27 +23,39 @@ GPIO(General-Purpose Input/Output) 通用输入/输出。GPIO 是一种电子元
 
 > 上拉输入(Pull-up input, PU)
 
+当输入信号比较弱，或者不稳定容易收到干扰的时候采用。因为需要电源高电平的强心针来稳定。
+
 上拉输入是指当没有外部信号时，GPIO 输出高电平。
+
+![上拉输入](../../assets/images/gpio/pui.png)
 
 ### 下拉输入
 
 > 下拉输入(Pull-down input, PD)
 
+一般都不用。
+
 下拉输入是指当没有外部信号时，GPIO 输出低电平.
+
+![下拉输入](../../assets/images/gpio/poi.png)
 
 ### 浮空输入
 
 > 浮空输入(Floating input, FLO)
 
-芯片复位的默认输入方式就是浮空输入。
+芯片复位的默认输入方式就是浮空输入，也最常用的模式。
 
-浮空输入读取的电位不确定，是指当没有外部信号时，GPIO 保持高低电平不变。外部信号是什么，GPIO 就输出什么。
+浮空输入读取的电位不确定。缺点是当没有外部信号时，端口状态不确定。GPIO 保持高低电平不变。外部信号是什么，GPIO 就输出什么。
+
+![浮空输入](../../assets/images/gpio/fi.png)
 
 ### 模拟输入
 
 > 模拟输入(Analog input, AN)
 
 主要是为了实现对外部信号的采集。
+
+![模拟输入](../../assets/images/gpio/ai.png)
 
 ## 输出
 
@@ -78,3 +90,12 @@ GPIO(General-Purpose Input/Output) 通用输入/输出。GPIO 是一种电子元
 > 复用开漏输出(Multiplexed open-drain output, MOP)
 
 在特殊功能才会用到
+
+## 输出速度
+
+GPIO 输出速度有以下3种：
+* 2MHz
+* 10MHz
+* 50MHz
+
+数值越大，变化速度越快，坡度越陡。可以理解为斜率k。
