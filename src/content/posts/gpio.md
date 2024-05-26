@@ -67,11 +67,15 @@ GPIO(General-Purpose Input/Output) 通用输入/输出。GPIO 是一种电子元
 
 可以输出较大的电流，但是只能输出低电平或高电平，也就是说电压固定，不是0V，就是3.3V。
 
+![推挽输出](../../assets/images/gpio/two.png)
+
 ### 开漏输出
 
 > 开漏输出(Open-drain output, OD)
 
 如果我们需要更大电流，比如5V，就用开漏输出，外界电源。
+
+![开漏输出](../../assets/images/gpio/klo.png)
 
 ### 普通输出和复用输出的区别
 
