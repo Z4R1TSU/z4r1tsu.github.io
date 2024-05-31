@@ -46,9 +46,9 @@ const Comments = () => {
         <Giscus
           id={id}
           repo="Z4R1TSU/z4r1tsu.github.io"
-          repoId="R_kgDOKeudTw"
+          repoId="R_kgDOL9KkyQ"
           category="Announcements"
-          categoryId="DIC_kwDOKeudT84Cch4W"
+          categoryId="DIC_kwDOL9Kkyc4CfvwR"
           mapping="title"
           reactionsEnabled="1"
           emitMetadata="0"
