@@ -1,6 +1,6 @@
 ---
 title: "Stanford CS144 lab 0"
-description: "这是一篇关于 Stanford CS144 lab 0 的文章。"
+description: "这是一篇关于 Stanford CS144 lab 0 的文章。主要讲了webget和byte stream的实现。"
 pubDatetime: 2023-09-07
 author: Zari Tsu
 featured: false
