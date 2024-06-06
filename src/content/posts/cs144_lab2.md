@@ -18,10 +18,11 @@ tags:
 这个lab分为两个部分——wrap和unwrap，TCP receiver的实现  
 回顾lab0和lab1，它们其实都是一个造积木的过程，而到了lab2当中，当然wrap和unwrap也还是在造积木。但到了TCPreceiver则开始搭积木了，它将之前我们所创建的几个小Class，通过调用其中的几个API给组合在了一起
 
-大家只需要知道最关键的两个点: 
+大家只需要知道最关键的几个点: 
 
-* 64(abs_seqno) -> 32(seqno): $(ZeroPoint + AbsSeqno) \bmod 2 ^ {32} = Seqno$
+* 64(abs_seqno) -> 32(seqno):  $Seqno = (ZeroPoint + AbsSeqno) \bmod 2 ^ {32}$
 * 32(seqno) -> 64(abs_seqno): $AbsSeqno = Seqno + n * 2 ^ {32} - ZeroPoint$
+* 然后对于可能的`Seqno`找相邻的两个，总共三个可能的值对`checkpoint`找距离最近的那个
 * stream_index <-> abs_seqno: 这俩转换就多或者少了一个`SYN`和`FIN`而已，很简单。
 
 ### wrap和unwrap的实现
