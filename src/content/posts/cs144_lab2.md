@@ -1,7 +1,7 @@
 ---
 title: "Stanford CS144 lab 2"
 description: "这是一篇关于 Stanford CS144 lab 2 的文章。主要讲的TCP receiver的实现。"
-pubDatetime: 2024-06-07
+pubDatetime: 2024-06-06
 author: Zari Tsu
 featured: false
 draft: false
@@ -11,8 +11,18 @@ tags:
 
 # Stanford CS144 lab 2
 
+[视频讲解]()
+
+~~这期状态比较差，视频讲的很一般。~~
+
 这个lab分为两个部分——wrap和unwrap，TCP receiver的实现  
 回顾lab0和lab1，它们其实都是一个造积木的过程，而到了lab2当中，当然wrap和unwrap也还是在造积木。但到了TCPreceiver则开始搭积木了，它将之前我们所创建的几个小Class，通过调用其中的几个API给组合在了一起
+
+大家只需要知道最关键的两个点: 
+
+* 64(abs_seqno) -> 32(seqno): `(zero_point + absolute_seqno) % (1 << 32) = seqno`
+* 32(seqno) -> 64(abs_seqno): `absolute_seqno = seqno + n * (1 << 32) - zero_point`
+* stream_index <-> abs_seqno: 这俩转换就多或者少了一个`SYN`和`FIN`而已，很简单。
 
 ### wrap和unwrap的实现
 
