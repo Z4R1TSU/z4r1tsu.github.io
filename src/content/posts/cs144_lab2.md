@@ -1,7 +1,7 @@
 ---
 title: "Stanford CS144 lab 2"
-description: "这是一篇关于 Stanford CS144 lab 2 的文章。"
-pubDatetime: 2023-09-07
+description: "这是一篇关于 Stanford CS144 lab 2 的文章。主要讲的TCP receiver的实现。"
+pubDatetime: 2024-06-07
 author: Zari Tsu
 featured: false
 draft: false
@@ -56,34 +56,32 @@ wrap比较简单，而unwrap除了直接取模，还存在着两个fringe case..
 ```cpp
 Wrap32 Wrap32::wrap( uint64_t n, Wrap32 zero_point )
 {
-  // Convert absolute seqno → seqno. 
-  // Given an absolute sequence number (n) and an Initial Sequence Number (zero point), produce the sequence number for n.
-  const uint32_t mask = 0xFFFFFFFF;
-  return (zero_point + static_cast<uint32_t>(n & mask));
+	uint32_t raw = (static_cast<uint32_t>(n) + zero_point.raw_value_) % (1UL << 32);
+	return Wrap32 { raw };
 }
 ```
 
 ```cpp
 uint64_t Wrap32::unwrap( Wrap32 zero_point, uint64_t checkpoint ) const
 {
-  // Convert seqno → absolute seqno. 
-  // Given a sequence number (raw_value_), the Initial Sequence Number (zero point), and an absolute checkpoint sequence number,
-  // find the corresponding absolute sequence number that is closest to the checkpoint.
-  const uint64_t low32_mask = 0x0000'0000'FFFF'FFFF;
-  const uint64_t high32_mask = 0xFFFF'FFFF'0000'0000;
-  uint64_t low32_ab_seqno = raw_value_ - zero_point.raw_value_;
-  uint64_t low32_checkpoint = checkpoint & low32_mask;
-  uint64_t high32_checkpoint = checkpoint & high32_mask;
+	uint64_t prefix = checkpoint & 0xFFFF'FFFF'0000'0000;
+	uint64_t raw;
+	if (this->raw_value_ >= zero_point.raw_value_) {
+		raw = (static_cast<uint64_t>(this->raw_value_) - static_cast<uint64_t>(zero_point.raw_value_));
+	} else {
+		raw = (static_cast<uint64_t>(this->raw_value_) + (1UL << 32) - static_cast<uint64_t>(zero_point.raw_value_));
+	}
+	uint64_t probable_res2 = prefix + raw;
+	uint64_t probable_res1 = probable_res2 > (1UL << 32) ? probable_res2 - (1UL << 32) : probable_res2;
+	uint64_t probable_res3 = probable_res2 < (0xFFFF'FFFF'FFFF'FFFF) - (1UL << 32) ? probable_res2 + (1UL << 32) : probable_res2;
 
-  if (high32_checkpoint && low32_ab_seqno > low32_checkpoint && low32_ab_seqno - low32_checkpoint > (1UL << 32) / 2) {
-    // last loop is closer
-    return (high32_checkpoint | low32_ab_seqno) - (1UL << 32);
-  } else if (high32_checkpoint + (1UL << 32) <= high32_mask && (low32_ab_seqno < low32_checkpoint && low32_checkpoint - low32_ab_seqno > (1UL << 32) / 2)) {
-    // next loop is closer
-    return (high32_checkpoint | low32_ab_seqno) + (1UL << 32);
-  }
-
-  return high32_checkpoint | low32_ab_seqno;
+	if (checkpoint - probable_res1 < (1UL << 31)) {
+		return probable_res1;
+	} else if (probable_res3 - checkpoint < (1UL << 31)) {
+		return probable_res3;
+	} else {
+		return probable_res2;
+	}
 }
 ```
 
@@ -100,60 +98,38 @@ using namespace std;
 
 void TCPReceiver::receive( TCPSenderMessage message )
 {
-  // Your code here.
-  if (writer().has_error()) {
-    return;
-  }
-
-  if (message.RST) {
-    reader().set_error();
-    return;
-  }
-
-  if (!zero_point_.has_value()) {
-    if (!message.SYN) {
-      // we do nothing utill S bit is set
-      return;
-    }
-    zero_point_.emplace(message.seqno);
-  }
-
-  uint64_t check_point = writer().bytes_pushed() + 1;
-  uint64_t abs_seqno = message.seqno.unwrap(zero_point_.value(), check_point);
-  uint64_t stream_index;
-
-  if (message.SYN) {
-    stream_index = 0;
-  } else {
-    stream_index = abs_seqno - 1;
-  }
-
-  reassembler_.insert(stream_index, std::move(message.payload),  message.FIN);
+	if (writer().has_error()) {
+		return;
+	}
+	if (message.RST) {
+		reader().set_error();
+		return;
+	}
+	// the parameters should be translated from seqno to absolute seqno
+	if (!isn_.has_value()) {
+		if (!message.SYN) {
+			return;
+		}
+		isn_.emplace(message.seqno);
+	}
+	Wrap32 zero_point = isn_.value();
+	uint64_t checkpoint = writer().bytes_pushed() + static_cast<uint32_t>(message.SYN);
+	uint64_t abs_seqno = message.seqno.unwrap(zero_point, checkpoint);
+	uint64_t stream_index = abs_seqno + static_cast<uint64_t>(message.SYN) - 1;
+	reassembler_.insert(stream_index, move(message.payload), message.FIN);
 }
 
 TCPReceiverMessage TCPReceiver::send() const
 {
-  // Your code here.
-  TCPReceiverMessage res;
-  res.window_size = writer().available_capacity() > UINT16_MAX? UINT16_MAX: static_cast<uint16_t>(writer().available_capacity());
-  res.RST = writer().has_error();
-
-  if (!zero_point_.has_value()) {
-    res.ackno = nullopt;
-
-    return res;
-  }
-
-  if (writer().is_closed()) {
-    // ackno = S bit + payload + F bit
-    res.ackno = Wrap32::wrap(1 + writer().bytes_pushed() + 1, zero_point_.value());
-  } else {
-    res.ackno = Wrap32::wrap(writer().bytes_pushed() + 1, zero_point_.value());
-  }
-
-  return res;
+	uint16_t wdsz = static_cast<uint16_t>(min(writer().available_capacity(), static_cast<uint64_t>(UINT16_MAX)));
+	bool reset = writer().has_error();
+	if (isn_.has_value()) {
+		Wrap32 ackno = Wrap32::wrap(writer().bytes_pushed() + static_cast<uint64_t>(writer().is_closed()), isn_.value()) + 1;
+		return { ackno, wdsz, reset };
+	} else {
+		return { nullopt, wdsz, reset };
+	}
 }
-
 ```
 
 * 测试结果:  
