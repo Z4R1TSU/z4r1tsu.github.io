@@ -20,8 +20,8 @@ tags:
 
 大家只需要知道最关键的两个点: 
 
-* 64(abs_seqno) -> 32(seqno): `(zero_point + absolute_seqno) % (1 << 32) = seqno`
-* 32(seqno) -> 64(abs_seqno): `absolute_seqno = seqno + n * (1 << 32) - zero_point`
+* 64(abs_seqno) -> 32(seqno): $(ZeroPoint + AbsSeqno) \bmod 2 ^ {32} = Seqno$
+* 32(seqno) -> 64(abs_seqno): $AbsSeqno = Seqno + n * 2 ^ {32} - ZeroPoint$
 * stream_index <-> abs_seqno: 这俩转换就多或者少了一个`SYN`和`FIN`而已，很简单。
 
 ### wrap和unwrap的实现
