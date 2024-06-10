@@ -1,5 +1,5 @@
 ---
-title: "微软C类插件转Clangd插件"
+title: "VSCode C类插件转Clangd插件"
 description: "这是一篇关于 C类插件 转 Clangd 的文章。"
 pubDatetime: 2024-06-10
 author: Zari Tsu
