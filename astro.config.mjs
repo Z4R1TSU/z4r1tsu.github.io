@@ -5,12 +5,16 @@ import sitemap from "@astrojs/sitemap";
 import { SITE } from "./src/config";
 import expressiveCode from "astro-expressive-code";
 import mdx from "@astrojs/mdx";
+import { starlightKatex } from "starlight-katex";
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://z4r1tsu.github.io',
   base: '/',
   integrations: [
+    starlight({
+      plugins: [starlightKatex()],
+    }),
     tailwind(), 
     react(),
     sitemap(),
