@@ -12,7 +12,8 @@
   "dependencies": {
     "@giscus/react": "^3.0.0",
     "astro": "^4.4.3",
-    "katex": "^0.16.10"
+    "rehype-katex": "^7.0.0",
+    "remark-math": "^6.0.0"
   },
   "devDependencies": {
     "@astrojs/mdx": "^2.1.1",

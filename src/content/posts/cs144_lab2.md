@@ -20,8 +20,8 @@ tags:
 
 大家只需要知道最关键的几个点: 
 
-* 64(abs_seqno) -> 32(seqno):  $Seqno = (ZeroPoint + AbsSeqno) \bmod 2 ^ {32}$
-* 32(seqno) -> 64(abs_seqno): $AbsSeqno = Seqno + n * 2 ^ {32} - ZeroPoint$
+* 64(abs_seqno) -> 32(seqno): $$ Seqno = (ZeroPoint + AbsSeqno) \bmod 2 ^ {32} $$
+* 32(seqno) -> 64(abs_seqno): $$ AbsSeqno = Seqno + n * 2 ^ {32} - ZeroPoint $$
 * 然后对于可能的`Seqno`找相邻的两个，总共三个可能的值对`checkpoint`找距离最近的那个
 * stream_index <-> abs_seqno: 这俩转换就多或者少了一个`SYN`和`FIN`而已，很简单。
 

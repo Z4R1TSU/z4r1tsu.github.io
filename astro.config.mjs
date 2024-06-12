@@ -5,8 +5,8 @@ import sitemap from "@astrojs/sitemap";
 import { SITE } from "./src/config";
 import expressiveCode from "astro-expressive-code";
 import mdx from "@astrojs/mdx";
-import katex from 'katex';
-import 'katex/dist/katex.min.css';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 // https://astro.build/config
 export default defineConfig({
@@ -39,13 +39,6 @@ export default defineConfig({
               `,
         hooks: {}
       }],
-      css: {
-        preprocessorOptions: {
-          css: {
-            additionalData: `@import 'katex/dist/katex.min.css';`
-          }
-        }
-      },
       useThemedScrollbars: false,
       useThemedSelectionColors: false,
       styleOverrides: {
@@ -61,6 +54,8 @@ export default defineConfig({
     mdx()
   ],
   markdown: {
+    remarkPlugins: [remarkMath],
+    rehypePlugins: [rehypeKatex],
     shikiConfig: {
       theme: "material-theme-darker",
       wrap: false
