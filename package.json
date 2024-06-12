@@ -12,8 +12,7 @@
   "dependencies": {
     "@giscus/react": "^3.0.0",
     "astro": "^4.4.3",
-    "katex": "^0.16.10",
-    "starlight-katex": "^0.0.1"
+    "katex": "^0.16.10"
   },
   "devDependencies": {
     "@astrojs/mdx": "^2.1.1",
