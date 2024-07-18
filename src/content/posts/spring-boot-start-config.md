@@ -1,7 +1,7 @@
 ---
 title: "Spring Boot 3 项目创建"
 description: "这是一篇关于 Spring Boot 3 项目创建的笔记。cpp转java实录。"
-pubDatetime: 2024-07-14
+pubDatetime: 2024-07-17
 author: Zari Tsu
 featured: false
 draft: false
@@ -50,6 +50,11 @@ tags:
 
 比如我创建的时候是3.3多，现在随便改
 
+这个需要注意，springboot应该是更新的快，然后mybatis-plus是来不及更新，所以遇到类似这样的报错，你可以尝试把spring boot的版本降低。
+```
+java.lang.IllegalArgumentException: Invalid value type for attribute 'factoryBeanObjectType': java.lang.String
+```
+
 ```xml
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -64,7 +69,7 @@ tags:
 
 ![](../../assets/images/maven-repo-location.png)
 
-6. 添加`mybatis-plus`依赖
+1. 添加`mybatis-plus`依赖
 
 添加到`pom.xml`文件中，改完记得刷新maven
 
