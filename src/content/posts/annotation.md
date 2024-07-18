@@ -24,10 +24,10 @@ tags:
 加在类的method上，通过容器自动注入bean。当然如果某个类基本都被加@Autowired，那么可以直接加在类上。
 
 3. @Component,@Repository,@Service, @Controller  
-@Component：通用的注解，标记某个代码段使得容器可以扫描到它，从而策成为 Spring 组件。如果一个 Bean 不知道属于哪个层，可以使用`@Component` 注解标注。  
-@Repository : Dao 层，数据库相关操作。  
-@Service : 对应服务层，主要涉及一些复杂的逻辑，需要用到 Dao 层。   
-@Controller : 对应 Spring MVC 控制层，主要用于接受用户请求并调用 Service 层返回数据给前端页面。
+@Component：通用的注解，标记某个代码段使得容器可以扫描到它，从而策成为 Spring 组件。如果一个 Bean 不知道属于哪个层，可以使用`@Component` 注解标注。而下面这三个其实都是它的衍生注解  
+@Repository : Dao 层，数据库相关操作。标记在数据访问类上，由于跟`mybatis-plus`整合，一般用的比较少。   
+@Service : 对应服务层，主要涉及一些复杂的逻辑，需要用到 Dao 层。一般标注在Service层。  
+@Controller : 对应 Spring MVC 控制层，主要用于接受用户请求并调用 Service 层返回数据给前端页面。一般标注在Controller层。
 
 4. @RestController (@Controller + @ResponseBody)  
 @RestController 注解相当于 `@Controller` 和 `@ResponseBody` 注解的组合，可以将返回值直接写入 HTTP 响应体中。现在很少裸用@Controller，一般都是用@RestController。
