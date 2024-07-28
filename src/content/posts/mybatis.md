@@ -105,9 +105,10 @@ tags:
 
 这些都放心调就行了，因为这些MPJ开头的类都是扩展自Base开头的MP类，所以后者有的，前者不会拉下。
 
-1. 将所有mapper文件做调整，获取MPJ的接口实现(必须)
+1. 将所有mapper文件做调整，获取MPJ的接口实现(必须)，而且记得加这个注解，不加的话，任何test测试都会报错
 
 ```java
+@Mapper
 public interface UserMapper extends MPJBaseMapper<User> {
 }
 ```
@@ -129,4 +130,3 @@ public class UserServiceImpl extends MPJBaseServiceImpl<UserMapper, User>
     // 添加实现
 }
 ```
-
