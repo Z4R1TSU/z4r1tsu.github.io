@@ -11,6 +11,10 @@ tags:
 
 # Mybatis
 
+官方文档: [Mybatis-Plus](https://baomidou.com/introduce/), [Mybatis-Plus-Join](https://yulichang.github.io/mybatis-plus-join-doc/pages/quickstart/js.html)
+
+个人觉得看官方文档大于看那些杂七杂八的视频，真的文档半个小时学会所有语法，看那些什么黑马啊，几个小时你还用不明白。就算忘记了，也可以去文档，就跟小时候查字典一样，哪里不会查哪里，越用越熟的。
+
 先来概述一波，搞java后端说白了就是玩数据库的(并把操控的接口暴露给前端使用)。而为了要能在Spring Boot框架下的Java项目操控DB，就需要JDBC，它使得我们可以在Java代码中直接操作数据库。但是，问题在于JDBC还是很复杂，我们进行了简化就有了基于ORM框架的Mybatis。
 
 你先别急，还有但是，Mybatis其实还是不够简单，为了照顾"低能"的Java程序员，我们连SQL语句都不想打怎么办，就出现了Mybatis Plus，有了它我们甚至只需要用它的封装库，就可以对数据库单表进行CRUD操作。
@@ -130,3 +134,11 @@ public class UserServiceImpl extends MPJBaseServiceImpl<UserMapper, User>
     // 添加实现
 }
 ```
+
+## 总结
+
+再提一点我的个人体验，MP和MybatisX是我平时一直用的，但是这俩仅限于单表CRUD操作，对于多表查询和分页处理，还是需要SQL语句的编写。而MPJ我感觉其实并不好用，不如你直接去`Mapper`里面直接用SQL语句实现，其实写个SQL并没有很难，况且Join类的多表操作其实并不多，它的效率问题就注定了频率不可能很高。但是MPJ你装了肯定无伤大雅的，它是对MP的扩展，MP有的它都有的，万一用到了对吧，而且它的封装更好听更规范。
+
+`Wrapper`这个概念在MP里面也算是重点了，我的经验是抛弃所有普通Wrapper，只用`LambdaWrapper`，不论你是单纯查询还是更新。二者区别就是，前者来做判断是用字段名称的String形式区分，后者调用实体类的方法来区分，前者你可能记错，后者不可能对错。
+
+而在MPJ里面，只有`MPJLambdaWrapper`和`MPJQueryWrapper`。这里老样子我还是建议使用前者，不同点在于后者是要写SQL语句的，前者可以用`Class::GetMethod`的办法，因为你都用这些插件了，还用SQL不是脱裤子放屁吗。
