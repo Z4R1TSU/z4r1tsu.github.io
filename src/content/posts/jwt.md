@@ -41,7 +41,9 @@ JWT (JSON Web Token) 在 Spring Boot 中非常流行，也是比较推荐的一�
 
 ### 引入依赖
 
-这里只显示本文重点的两个依赖
+这里只显示本文重点的两个依赖，其他依赖的话，比如jjwt-api这种就不显示了。
+
+此外也可以换用其他的，比如jjwt的0.12.x版本，或者auth0的java-jwt。
 
 ```xml
    <dependency>

@@ -1,6 +1,6 @@
 ---
-title: "Redis"
-description: "这是一篇关于 Redis 的文章，cpp转java实录。包括了Redis的基本知识和用法，以及在Spring Boot中集成Redis的配置。"
+title: "Redis基本操作"
+description: "这是一篇关于 Redis 基本操作的文章，cpp转java实录。包括了Redis的基本知识和用法，以及在Spring Boot中集成Redis的配置。"
 pubDatetime: 2024-07-31
 author: Zari Tsu
 featured: false
@@ -9,7 +9,7 @@ tags:
   - Java
 ---
 
-# Redis
+# Redis 基本操作
 
 之前学了数据库，比如MySQL, PostgreSQL，这种全都是关系型数据库，它们都存在显著的问题，那就是按照木桶效应，速度最慢的硬盘成为了提升性能的瓶颈。而Redis等非关系型数据库(NoSQL)则是一种解决方案，它可以将数据存储在内存中，这样就可以提升性能。
 
@@ -108,6 +108,33 @@ Redis的哨兵模式是一种高可用性的模式，它可以实现Redis的主�
    LLEN key // 获取列表key的长度
    ```
 
+### 哈希操作(Hash)
+
+Redis的哈希表是String类型的field和value的映射表，它是一种非常灵活的数据结构。你可以理解为一个string对应一个map，field是key，value是value。
+
+1. 增
+
+   ```
+   HSET key field value // 设置哈希表key中field对应的值为value
+   HMSET key field1 value1 field2 value2 // 批量设置哈希表key中多个field的值
+   ```
+
+2. 删
+
+   ```
+   HDEL key field // 删除哈希表key中field对应的值
+   ```
+
+3. 查
+
+   ```
+   HGET key field // 获取哈希表key中field对应的值
+   HEXISTS key field // 判断哈希表key中是否存在field对应的值
+   HGETALL key // 获取哈希表key中所有键值对
+   HKEYS key // 获取哈希表key中所有键
+   HVALS key // 获取哈希表key中所有值
+   ```
+
 ### 集合操作(Set)
 
 1. 增/删
@@ -146,31 +173,6 @@ Redis的哨兵模式是一种高可用性的模式，它可以实现Redis的主�
    ZRANGE key start end // 获取有序集合key的start到end之间的元素
    ZRANGEBYSCORE key min max // 获取有序集合key中分数在min和max之间的元素
    ZCARD key // 获取有序集合key的元素个数
-   ```
-
-### 哈希操作(Hash)
-
-1. 增
-
-   ```
-   HSET key field value // 设置哈希表key中field对应的值为value
-   HMSET key field1 value1 field2 value2 // 批量设置哈希表key中多个field的值
-   ```
-
-2. 删
-
-   ```
-   HDEL key field // 删除哈希表key中field对应的值
-   ```
-
-3. 查
-
-   ```
-   HGET key field // 获取哈希表key中field对应的值
-   HEXISTS key field // 判断哈希表key中是否存在field对应的值
-   HGETALL key // 获取哈希表key中所有键值对
-   HKEYS key // 获取哈希表key中所有键
-   HVALS key // 获取哈希表key中所有值
    ```
 
 ### 位图操作(Bitmap)
