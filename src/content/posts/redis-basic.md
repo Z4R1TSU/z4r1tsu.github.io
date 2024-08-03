@@ -1,6 +1,6 @@
 ---
 title: "Redis基本操作"
-description: "这是一篇关于 Redis 基本操作的文章，cpp转java实录。包括了Redis的基本知识和用法，以及在Spring Boot中集成Redis的配置。"
+description: "这是一篇关于 Redis 基本操作的文章，cpp转java实录。包括了Redis的安装与配置，基本知识和用法。"
 pubDatetime: 2024-07-31
 author: Zari Tsu
 featured: false
@@ -296,47 +296,3 @@ Redis事务提供了一种将多个命令操作在一个事务中执行的机制
    ```
    PFMERGE destkey sourcekey [sourcekey ...] // 将多个HyperLogLog合并到一个HyperLogLog中
    ```
-
-## Spring Boot集成Redis
-
-在Spring Boot中集成Redis，需要在pom.xml中添加Redis的依赖：
-
-```xml
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-redis</artifactId>
-</dependency>
-```
-
-然后在`application.yml`中配置Redis的连接信息：
-
-```yaml
-spring:
-  redis:
-    host: 127.0.0.1  # Redis服务器地址
-    port: 6379  # Redis服务器端口
-    password: <PASSWORD>
-    lettuce:   # 一般新的springboot用的都是lettuce
-      pool:
-        max-active: 8  # 连接池最大连接数（使用负值表示没有限制）
-        max-idle: 8  # 连接池最大空闲连接数
-        min-idle: 0  # 连接池最小空闲连接数
-        time-between-eviction-runs: 10m  # 连接空闲超时时间
-```
-
-然后就可以在Spring Boot的Bean中注入RedisTemplate，进行Redis的操作：
-
-```java
-@Autowired
-private RedisTemplate<String, Object> redisTemplate;
-
-public void set(String key, Object value) {
-    redisTemplate.opsForValue().set(key, value);
-}
-
-public Object get(String key) {
-    return redisTemplate.opsForValue().get(key);
-}
-```
-
-这样就可以在Spring Boot中使用Redis了。
