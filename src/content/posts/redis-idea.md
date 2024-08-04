@@ -1,6 +1,6 @@
 ---
 title: "Redis 整合"
-description: "这是一篇关于 Redis 整合的文章，cpp转java实录。在Spring Boot中集成Redis和适用"
+description: "这是一篇关于 Redis 整合的文章，cpp转java实录。在Spring Boot中集成Redis和操作使用。"
 pubDatetime: 2024-08-03
 author: Zari Tsu
 featured: false
@@ -175,3 +175,35 @@ private StringRedisTemplate stringRedisTemplate;
         ```
 
 其他的暂且不提，因为用的确实比较少
+
+## 问题记录
+
+接下来记录一下我遇到的问题
+
+1. 在我们使用`@Autowired`注解尝试对redisTemplate进行注入时会报Warning。
+
+     这个呢，你要么用`@Resource`注解，要么用IDEA推荐的方法，将要注入的redisTemplate通过输入的参数来获取
+
+2. `StringRedisTemplate`能用，但是`RedisTemplate`使用报null的错。
+
+     这个是因为两者默认的序列化方式不同，你注意发现的话，前者在redis中显示的方式就是可阅读的字符串，而后者则是`0x`开头的字节码形式。所以如果你要用`RedisTemplate`，需要我们去配置一下redisTemplate的序列化方式。
+
+     ```java
+     // 这个可以放在config包下的RedisConfig类中
+     // 这里的Object可以替换成你要序列化的对象类型
+     @Configuration
+
+     public class RedisConfig {
+
+     @Bean
+     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
+          RedisTemplate<String, Object> template = new RedisTemplate<>();
+          template.setConnectionFactory(factory);
+          template.setKeySerializer(new StringRedisSerializer());
+          template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
+          template.setHashKeySerializer(new StringRedisSerializer());
+          template.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+          return template;
+     }
+     }
+     ```
