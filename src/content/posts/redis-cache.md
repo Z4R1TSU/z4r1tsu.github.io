@@ -122,3 +122,107 @@ public void unlock(String key) {
     }
 }
 ```
+
+### 逻辑过期
+
+```java
+// 先封装data对象，将原数据和逻辑过期时间合并成一个对象
+@Data
+@AllArgsConstructor
+public class CacheData(Object data, LocalDateTime expireTime) {
+    Object rawData;
+    LocalDateTime expireTime;
+}
+
+private static final ExecutorService executor = Executors.newFixedThreadPool(10);
+
+public Object queryWithRedisCache(String key) {
+    // 获取key，一般都会加个前缀来注明作缓存用
+    String key = "cache:" + key;
+    // 查询Redis中是否存在该key对应的缓存
+    CacheData cacheData = redisTemplate.opsForValue().get(key);
+    if (cacheData == null) {
+        // 如果不存在缓存，直接返回空
+        return null;
+    }
+    // 如果缓存中的逻辑时间过期，直接返回旧的这个过期的缓存
+    Object data = cacheData.getData();
+    LocalDateTime expireTime = cacheData.getExpireTime();
+    if (expireTime.isAfter(LocalDateTime.now())) {
+        // 缓存没有过期，直接返回这个可用的缓存
+        return data;
+    }
+    // 如果缓存过期，则查询数据库，并将结果缓存到Redis中
+    // 涉及到对数据库的操作，需要加锁
+    Boolean lock = requireLock(key);
+    if (!lock) {
+        // 申请失败，说明已经有线程在修改缓存，我们直接返回旧的缓存
+        return data;
+    }
+    // 申请锁成功，我们另开一个新线程去查询数据库，并更新缓存，本线程直接返回旧的缓存
+    executor.execute(() -> {
+        try {
+            Object result = queryFromDB();
+            if (result == null) {
+                // 如果查询结果为空，则直接返回null
+                return null;
+            }
+            // 缓存新数据
+            CacheData newCacheData = new CacheData(result, LocalDateTime.now().plusSeconds(60));
+            redisTemplate.opsForValue().set(key, newCacheData);
+        } catch (Exception e) {
+            // 出现异常，说明查询数据库失败，我们直接返回旧的缓存
+            return data;
+        } finally {
+            // 不管有没有遇到问题，都要释放锁
+            releaseLock(key);
+        }
+    });
+    // 因为我们在新线程进行了更新，所以本线程仍旧返回旧的缓存
+    return data;
+}
+```
+
+## 高阶改进
+
+上面的实现看起来还是非常朴素的，还有非常多的优化空间
+
+### 封装整个Redis的工具类
+
+这里就是把上面的代码都复制粘贴到一个独立的类当中，但是注意泛型的使用，要保证泛用性。
+
+### 使用官方锁
+
+我们自己写的锁，肯定不如它官方锁来的安全，并发度高，支持并发。
+
+比如说，可以使用Redisson来实现分布式锁，它可以自动续期，避免死锁，还可以实现公平锁，避免锁的饥饿。
+
+```java
+ // Redisson 客户端的配置 
+ Config config = new Config();
+ config.useSingleServer().setAddress("redis://your-redis-host:6379");
+ RedissonClient redisson = Redisson.create(config);
+
+ // requireLock 方法
+ public boolean requireLock(String key) {
+     RLock lock = redisson.getLock(key);
+     // 超时时间设置为 50 毫秒
+     return lock.tryLock(50, TimeUnit.MILLISECONDS);
+ }
+
+ // releaseLock 方法
+ public void releaseLock(String key) {
+     RLock lock = redisson.getLock(key);
+     lock.unlock();
+ }
+```
+
+### 使用Redis集群
+
+Redis集群可以提高Redis的读写性能，避免单点故障。
+
+```java
+RedisClusterClient redisClusterClient = RedisClusterClient.create("redis://localhost:7000,redis://localhost:7001,redis://localhost:7002");
+// 连接集群，获取RedisAdvancedClusterCommands对象，用来操作集群
+RedisAdvancedClusterCommands<String, String> commands = redisClusterClient.getAdvancedClusterCommands();
+```
