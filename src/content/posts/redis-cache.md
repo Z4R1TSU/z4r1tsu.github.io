@@ -1,6 +1,6 @@
 ---
 title: "Redis 缓存"
-description: "这是一篇关于 Redis 缓存的文章，cpp转java实录。在Spring Boot中集成Redis缓存，并使用注解来缓存方法的返回值。"
+description: "这是一篇关于 Redis 缓存的文章，cpp转java实录。在Spring Boot中集成Redis缓存，并囊括了整合Redisson的锁使用。"
 pubDatetime: 2024-08-04
 author: Zari Tsu
 featured: false
