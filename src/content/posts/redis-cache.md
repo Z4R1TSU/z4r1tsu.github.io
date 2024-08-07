@@ -228,3 +228,17 @@ RedisClusterClient redisClusterClient = RedisClusterClient.create("redis://local
 // 连接集群，获取RedisAdvancedClusterCommands对象，用来操作集群
 RedisAdvancedClusterCommands<String, String> commands = redisClusterClient.getAdvancedClusterCommands();
 ```
+
+### 使用Lua脚本
+
+为什么要使用 Lua 脚本，而不是直接封装 Java 方法，这里我详细为你解释：
+1. Lua 脚本在 Redis 中的优势：
+   1. 原子性： Lua 脚本在 Redis 中执行是原子性的，保证脚本中的所有操作要么全部执行成功，要么全部执行失败，避免了因并发问题导致数据不一致的情况。在秒杀场景中，原子性保证了库存更新和订单创建的同步，防止超卖问题。
+   2. 效率： Lua 脚本在 Redis 内执行，直接利用 Redis 的内存数据结构进行操作，效率非常高，而 Java 方法则需要进行网络通信，效率相对较低。对于高并发秒杀场景，效率的提升非常关键。
+   3. 安全性： Lua 脚本只能在 Redis 中执行，无法直接访问系统资源，安全性更高，避免了恶意代码执行的风险。
+2. 为什么不用直接封装 Java 方法？
+   1. 线程安全性： Java 方法在多线程环境中执行需要考虑线程安全问题，需要额外编写代码来保证数据一致性，相对复杂。
+   2. 网络通信： Java 方法需要通过网络通信与 Redis 交互，增加网络延迟，效率降低。
+   3. 数据一致性： 如果 Java 方法执行期间出现异常，可能会导致数据不一致，例如库存更新成功，但订单创建失败。
+
+所以综上所述，lua脚本其实是不能不学的，就算是实际上机开发也是会用到的。
