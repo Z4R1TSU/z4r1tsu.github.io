@@ -314,18 +314,28 @@ export default {
 
 2. 前端设置允许跨域
 
-我们需要在前端设置允许跨域，比如在`vue`项目中，我们可以用`axios`的`withCredentials`属性来设置。
+和项目后端的连接一般都是在`vue.config.js`文件中配置的，我们可以用`devServer`字段来设置允许跨域。通过设置代理，将以特定前缀的url访问，导入到后端。
 
 ```js
-// 创建 axios 实例
-const service = axios.create({
-    baseURL: 'http://127.0.0.1:8080', // api base_url
-    timeout: 5000, // 请求超时时间
-    withCredentials: true // 允许携带cookie
-});
+module.exports = {
+  devServer: {
+    host: 'localhost',
+    port: 8080,
+    proxy: {
+      // 假设url前缀是/api
+      '/api': {
+        // 假设后端是8081端口
+        target: 'http://localhost:8081',
+        // 是否允许跨域
+        changeOrigin: true,
+        // 路径重写，将/api替换成''
+        pathRewrite: {
+          '^/api': ''
+        }
+      }
+  }
+}
 ```
-
-这样就可以跨域了。
 
 ## 生命周期
 
