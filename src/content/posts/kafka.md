@@ -46,6 +46,49 @@ Apache Kafka 是一种高吞吐量的分布式消息系统，它可以处理大�
 5. 灵活的消费模式：Kafka支持多种消费模式，比如消费者消费模式、分区消费模式、主题消费模式等。
 6. 社区活跃：Kafka有大量的社区贡献者，活跃的社区氛围，是学习Kafka的不二之选。
 
+### Windows部署Kafka
+
+首先你需要明白，绝大部分的这种软件都需要在Linux环境下运行，在Windows都容易水土不服，所以你既然选择Windows部署，就只能麻烦一点了。
+
+我在网上找了一堆都是要Zookeeper的，但是这都多久的老黄历了，都抄来抄去没人更新，Kafka在2.8版本之后就推出了Kraft，使得可以抛去zk单独使用。
+
+1. 下载Kafka
+
+  [Kafka下载](https://kafka.apache.org/downloads)
+
+  注意下载的是bin的，不要下载src。
+
+2. 解压
+
+  解压得文件根目录的情况是这样的
+
+  ```sh
+  ╰─❯ tree . -L 1
+  .
+  ├── LICENSE
+  ├── NOTICE
+  ├── bin
+  ├── config
+  ├── libs
+  ├── licenses
+  ├── logs
+  └── site-docs
+  ```
+
+3. 配置
+
+  打开`config/kraft/server.properties`，切记不是`config/server.properties`，后者是基于Zookeeper的配置不用去管。
+
+  这边我们只需要修改`listeners`把它修改为`PLAINTEXT://localhost:9092`或者`PLAINTEXT://127.0.0.1:9092`，然后保存退出。
+
+4. 启动
+
+在根目录下打开命令行，输入这行启动Kafka。
+
+```sh
+bin/kafka-server-start.sh config/kraft/server.properties
+```
+
 ### Spring Boot 集成 Kafka
 
 1. 添加依赖
