@@ -13,13 +13,13 @@ tags:
 
 先来聊聊**Vue** ([vjuː]) 这玩意怎么读，其实跟View是同一个发音，大部分人都是VUE这样三个字母之间读下来，我之前还听到有人读yue的，没错就是那个呕吐的那个yue了，闹笑话了。
 
+现在全栈是一个有竞争力的点，并且在StackOverflow的统计当中，国外的全栈工程师的占比其实是最高的，因此在我们大概掌握了后端的使用后，我们需要了解一下前端。
+
 那么Vue.js是什么呢？它是一个渐进式的JavaScript框架，为了让我们更方便地用JavaScript操作HTML，即一个操作DOM API的框架。
 
 还有一个比较重要的点是Vue存在两种API风格偏好，分别是**Options API**和**Composition API**。前者在Vue 2.x版本中使用，后者在Vue 3.x版本才出现，也就是说前者是到Vue3也可以使用的，而后者在Vue2是不支持的。那么这两种萝卜青菜各有所爱，主要看公司的要求，我们在学的时候随意，网上应该是前者比较多，因为老古董挺多的，就跟CentOS现在还有人用一样。
 
 我其实更推荐用Composition API，因为其实Options API虽然便于理解，写起来方便，但是Composition API是Vue官方更为推荐的一种方式，出于它的代码可读性和可维护性比较高。
-
-现在全栈是一个有竞争力的点，并且在StackOverflow的统计当中，国外的全栈工程师的占比其实是最高的，因此在我们大概掌握了后端的使用后，我们需要了解一下前端。
 
 ## 安装配置项目
 
@@ -163,6 +163,20 @@ JavaScript是一门动态语言，可以用来做很多事情，比如动态修�
 * Graphical Rendering API：用来渲染图形，比如`canvas`和`webgl`等。
 * Video and Audio API：用来处理视频和音频，比如`video`和`audio`标签。
 * Storage API：用来处理本地存储，比如`localStorage`和`sessionStorage`。
+
+### Vue
+
+Vue的[官方文档](https://cn.vuejs.org/guide/introduction.html)是一个比较好的学习资料
+
+然后我们来了解一下为什么Vue可以做到效率高的同时，还兼顾了易上手易学的特性。
+
+首先，Vue的Template语法是基本完全类似于HTML的，使得其学习成本比较低廉。
+
+其次它拥有三个特性：
+
+1. Declarative: 它通过DSL(Domain-Specific Language)，在这里也就是Template模板，将模板转化为Virtual DOM，然后再与真实DOM进行比较，计算出最小的变化，从而更新真实DOM，使得页面更新更加高效。
+
+2. Reactive(Hot Reload): 它是响应式的，或者说是热更新的，这意味着它可以自动追踪数据的变化，并通知视图更新。比如我们例子里面的变量都是实时变化的。
 
 ## Vue 的使用
 
