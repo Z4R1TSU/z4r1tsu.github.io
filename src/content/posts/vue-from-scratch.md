@@ -206,7 +206,6 @@ Event -> Virtual DOM Tree -> Real DOM Tree -> Rendering
   color: #888;
 }
 </style>
-
 ```
 
 ### 基本编写
