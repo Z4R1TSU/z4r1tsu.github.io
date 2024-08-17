@@ -172,12 +172,17 @@ Vue的[官方文档](https://cn.vuejs.org/guide/introduction.html)是一个比�
 
 首先，Vue的Template语法是基本完全类似于HTML的，使得其学习成本比较低廉。
 
+<<<<<<< HEAD
 其次它拥有几个大的特性：
+=======
+其次它拥有三个特性：
+>>>>>>> 5fdb16987d9ea2fbc48f916d499b054ce25e7d63
 
 1. Declarative: 它通过DSL(Domain-Specific Language)，在这里也就是Template模板，将模板转化为Virtual DOM，然后再与真实DOM进行比较，计算出最小的变化，从而更新真实DOM，使得页面更新更加高效。
 
 2. Reactive(Hot Reload): 它是响应式的，或者说是热更新的，这意味着它可以自动追踪数据的变化，并通知视图更新。比如我们例子里面的变量都是实时变化的。
 
+<<<<<<< HEAD
 所以，可以总结出Vue的运行过程其实是这样的
 
 ```txt
@@ -187,6 +192,8 @@ Template(DSL) -> Virtual DOM -> DOM API -> Real DOM
 Event -> Virtual DOM Tree -> Real DOM Tree -> Rendering
 ```
 
+=======
+>>>>>>> 5fdb16987d9ea2fbc48f916d499b054ce25e7d63
 ## Vue 的使用
 
 所以初始化的HelloWorld.vue可以被这样理解
