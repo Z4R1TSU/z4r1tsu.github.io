@@ -64,19 +64,6 @@ const socialImageURL = new URL(ogImage ?? "og.png", Astro.url.origin).href;
 
     <script is:inline src="/toggle-theme.js"></script>
     
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LH9N740HBE"
-    ></script>
-    <script>
-      // @ts-nocheck
-      window.dataLayer = window.dataLayer || [];
-      function gtag() {
-        window.dataLayer.push(arguments);
-      }
-      gtag("js", new Date());
-
-      gtag("config", "G-LH9N740HBE");
-    </script>
 	</head>
 	<body>
 		<div class="stack backgrounds">
