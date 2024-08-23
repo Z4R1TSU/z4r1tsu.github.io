@@ -361,11 +361,43 @@ export default {
 
 ### 解决跨域问题
 
-**跨域这部分我还不确定，因为各种情况引人而异，这部分是ai自动生成的**
+由于我们前端和后端端口是必须分开的，而浏览器出于安全考虑需要对这种不同源的请求进行拦截，所以需要我们解决跨域问题。
+
+一般跨域问题的解决用的是CORS(Cross-Origin Resource Sharing)技术，它在不破坏现有规则的情况下，通过后端服务器实现CORS接口
 
 1. 后端设置允许跨域
 
-我们需要在后端设置允许跨域，比如在`springboot`项目中，我们可以用`@CrossOrigin`注解来设置。
+在Spring Boot当中，有比较简洁的解决方案。
+
+1. 如果我们想一次性对所有Controller都生效，我们需要设置一个Configuration类。
+
+  ```java
+  @Configuration
+  public class CorsConfig implements WebMvcConfigurer {
+      @Override
+      public void addCorsMappings(CorsRegistry registry) {
+          registry.addMapping("/**")  // 允许跨域访问所有路径的请求
+                .allowedOrigins("*")  // 允许跨域访问所有域名的请求
+                .allowedMethods("GET", "POST", "PUT", "DELETE")  // 允许跨域访问这四个常用的请求方法
+                .allowedHeaders("*")  // 允许跨域访问所有请求头
+                .allowCredentials(true)  // 允许携带cookie
+                .maxAge(3600);    // 预检请求的有效期
+      }
+  ```
+
+2. 如果我们只想对某个Controller生效，我们需要在Controller上添加注解。
+
+  ```java
+  @CrossOrigin
+  @RestController
+  @RequestMapping("/api")
+  public class HelloController {
+      @GetMapping("/hello")
+      public String hello() {
+          return "Hello";
+      }
+  }
+  ```
 
 2. 前端设置允许跨域
 
