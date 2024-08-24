@@ -6,7 +6,7 @@ author: Zari Tsu
 featured: false
 draft: false
 tags:
-  - Java
+  - Database
 ---
 
 # 在WSL上部署MySQL并连接到Navicat
