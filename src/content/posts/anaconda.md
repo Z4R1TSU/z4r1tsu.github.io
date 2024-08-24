@@ -1,7 +1,7 @@
 ---
 title: "Anaconda"
 description: "这是一篇关于 Anaconda 的基础介绍和使用的文章。"
-pubDatetime: 2024-07-25
+pubDatetime: 2024-08-24
 author: Zari Tsu
 featured: false
 draft: false
