@@ -121,4 +121,17 @@ tags:
 
     Aspect Oriented Programming，面向切面编程，是一种编程技术，它可以将一些通用功能抽象为一个模块，然后在需要的时候，将这个模块应用到另一个模块中，从而达到代码的重用和模块化的目的。
 
-2. 设计模式：工厂模式
+2. Spring Boot中的设计模式？
+   1. 单例模式: 在Spring中定义的bean默认是单例模式。
+
+   2. 工厂模式：Spring使用工厂模式通过BeanFactory、ApplicationContext创建Bean对象。
+
+   3. 代理模式：Spring AOP功能的实现是通过代理模式中的动态代理实现的。
+
+   4. 策略模式：Spring中资源访问接口Resource的设计是一种典型的策略模式。Resource接口是所有资源访问类所实现的接口，Resource 接口就代表资源访问策略，但具体采用哪种策略实现，Resource 接口并不理会。客户端程序只和 Resource 接口耦合，并不知道底层采用何种资源访问策略，这样客户端程序可以在不同的资源访问策略之间自由切换。
+
+   5. 适配器模式：Spring AOP的增强或通知使用到了适配器模式。
+
+   6. 装饰器模式：Spring 中配置 DataSource 的时候，DataSource 可能是不同的数据库和数据源，项目需要连接多个数据库，这种模式让我们可以根据客户需求切换不同的数据源。
+
+   7. 模板模式：Spring中jdbcTemplate、hibernateTemplate等以Template结尾的对数据库操作的类，就是用到了模板模式。
