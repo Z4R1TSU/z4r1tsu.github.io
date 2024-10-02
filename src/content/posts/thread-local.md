@@ -1,7 +1,7 @@
 ---
 title: "ThreadLocal"
 description: "这是一篇关于 ThreadLocal 的文章。讲讲Java当中是如何利用 ThreadLocal 来保存当前用户信息的"
-pubDatetime: 2024-10-03
+pubDatetime: 2024-10-02
 author: Zari Tsu
 featured: false
 draft: false
