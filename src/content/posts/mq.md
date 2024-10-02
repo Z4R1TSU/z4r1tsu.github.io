@@ -6,7 +6,7 @@ author: Zari Tsu
 featured: false
 draft: false
 tags:
-  - Interview
+  - Java
 ---
 
 # 消息队列 MQ
