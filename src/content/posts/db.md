@@ -179,7 +179,170 @@ MySQL默认的隔离级别是可重复读（REPEATABLE READ）。
 2. 对于日期类型，尽量使用datetime，因为datetime可以存储更加精确的时间，而date则只存储日期。
 3. 对于货币或者其他金额类型，尽量使用decimal，因为decimal可以存储更大的数值，并且有小数点。
 
-### 使用建议
+### SQL语句建议
 
 1. select * 尽量不要使用，因为会消耗大量的IO，应该只查询必要的字段。
 2. 尽量少的使用连表查询，而是在设计表的时候就先考虑好关系，尽量减少表的数量。
+
+### enum枚举处理
+
+我们常常会遇到一些需要用到枚举的场景，比如订单状态、用户类型等。毕竟使用数字来记忆可读性是很差的，所以我们往往会添加一个描述来组成枚举。
+
+但是呢，我们在Spring Boot中代码可以是要创建一个enum类的，可是在数据库当中enum比较麻烦，往往我们会采用一个普通的int类型，来存储enum类中对应的code。要解决这二者间的对应关系就显得比较重要了。
+
+```java
+// entity 创建enum类并添加注解使之与数据库int类型对应
+@Getter
+@AllArgsConstructor
+public enum OrderStatus {
+   // 枚举项名(code, desc)
+   CREATED(1, "已创建"),
+   PAID(2, "已支付"),
+   SHIPPED(3, "已发货"),
+   DELIVERED(4, "已送达"),
+   CANCELLED(5, "已取消");
+
+   // 添加这个注解使得数据库int类型与枚举code对应
+   @EnumValue
+   private int code;
+   // 添加这个注解可以让前端返回的是枚举的描述，也就是“已创建”而不是“1
+   @JsonValue
+   private String desc;
+
+   OrderStatus(String desc) {
+      this.desc = desc;
+   }
+
+   Integer getCode() {
+      return this.code;
+   }
+}
+```
+
+当然我们还需要配置，使得识别生效，常用的我们通过yaml配置的方式来实现。
+
+```yaml
+# application.yml 激活枚举配置
+mybatis-plus:
+  configuration:
+    default-enum-type-handler: xx.xx.xx.MyEnumTypeHandler
+```
+
+除了通过yaml配置，还可以直接编写一个配置类
+
+```java
+@Configuration
+public class MybatisPlusAutoConfiguration {
+
+   @Bean
+   public MybatisPlusPropertiesCustomizer mybatisPlusPropertiesCustomizer() {
+      return properties -> {
+         GlobalConfig globalConfig = properties.getGlobalConfig();
+         globalConfig.setBanner(false);
+         MybatisConfiguration configuration = new MybatisConfiguration();
+         configuration.setDefaultEnumTypeHandler(MyEnumTypeHandler.class);
+         properties.setConfiguration(configuration);
+      };
+   }
+}
+```
+
+### 分页
+
+当我们查询出来的结果有比如1w条的时候，这样页面一页是肯定放不下的，这时候我们就需要分页来显示。当然实现分页的方式有很多种，但常用的就是利用MP的分页插件来实现。
+
+首先我们需要先配置分页插件
+
+```java
+@Configuration
+public class MybatisPlusConfig {
+
+   @Bean
+   public MybatisPlusInterceptor mybatisPlusInterceptor() {
+      // 创建拦截器
+      MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
+      // 创建分页插件
+      PaginationInnerInterceptor paginationInnerInterceptor = new PaginationInnerInterceptor(DbType.MYSQL);
+      // 设置分页插件
+      paginationInnerInterceptor.setMaxLimit(1000L);
+      // 将分页插件添加到拦截器中，当然也能添加其他插件
+      interceptor.addInnerInterceptor(paginationInnerInterceptor);
+      return interceptor;
+   }
+
+}
+```
+
+下面就是具体分页的使用操作了，如何使用API来实现分页。由于其实每个分页的重复操作很多，所以我们封装一个通用的分页方法。
+
+三步走：
+
+1. 创建page对象，设置当前页页号和每页显示条数，以及排序规则。
+
+   ```java
+   @Data
+   @Tag(name = "分页查询参数")
+   public class PageQuery {
+
+      @Operation(summary = "当前页页号")
+      private Long current = 1;
+      @Operation(summary = "每页显示条数")
+      private Long size = 10;
+      @Operation(summary = "排序字段")
+      private String sort;
+      @Operation(summary = "是否升序")
+      private Boolean isAsc;
+
+      public <T> Page<T> toPage(OrderItem orderItem) {
+         // 创建page对象，设置当前页页号和每页显示条数
+         Page<T> page = Page.of(current, size);
+         if (StrUtil.isNotBlank(sort)) {
+            page.addOrder(isAsc? OrderItem.asc(sort) : OrderItem.desc(sort));
+         } else {
+            // 使用传入的排序规则
+            page.addOrder(orderItem);
+         }
+         return page;
+      }
+
+   }
+   ```
+
+2. 执行查询（解析数据）
+
+   ```java
+   Page<User> page = PageQuery.toPage();
+   // 执行查询-方法1
+   Page<User> result = userMapper.selectPage(page, new QueryWrapper<>());
+   // 执行查询-方法2
+   Page<User> result = lambdaQuery().page(page);
+   // 解析总条数
+      long total = result.getTotal();
+   // 解析总页数
+   long pages = result.getPages();
+   // 解析数据
+   List<User> records = result.getRecords();
+   ```
+
+3. 封装分页结果，创建一个通用的分页DTO，用泛型来接收不同类型的分页参数
+
+   ```java
+   @Data
+   @Tag(name = "分页结果")
+   public class PageDTO<T> {
+      @Operation(summary = "总条数")
+      private Long total;
+      @Operation(summary = "总页数")
+      private Long pages;
+      @Operation(summary = "当前页数据")
+      private List<T> records;
+
+      public static <PO, VO> PageDTO<VO> of(Page<PO> page, Class<VO> voClass) {
+         PageDTO<VO> pageDTO = new PageDTO<>();
+         pageDTO.setTotal(page.getTotal());
+         pageDTO.setPages(page.getPages());
+         pageDTO.setRecords(BeanUtil.copyToList(page.getRecords()), voClass);
+         return pageDTO;
+      }
+   }
+   ```
