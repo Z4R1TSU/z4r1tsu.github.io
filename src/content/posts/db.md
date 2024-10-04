@@ -337,12 +337,14 @@ public class MybatisPlusConfig {
       @Operation(summary = "当前页数据")
       private List<T> records;
 
-      public static <PO, VO> PageDTO<VO> of(Page<PO> page, Class<VO> voClass) {
+      public static <PO, VO> PageDTO<VO> of(Page<PO> page, Function<PO, VO> mapper) {
          PageDTO<VO> pageDTO = new PageDTO<>();
          pageDTO.setTotal(page.getTotal());
          pageDTO.setPages(page.getPages());
-         pageDTO.setRecords(BeanUtil.copyToList(page.getRecords()), voClass);
+         pageDTO.setRecords(page.getRecords().stream().map(mapper).collect(Collectors.toList()));
          return pageDTO;
       }
    }
+   // 这样我们在调用的时候就可以直接封装
+   // return PageDTO.of(result, user -> BeanUtil.copyProperties(user, UserVO.class));
    ```
