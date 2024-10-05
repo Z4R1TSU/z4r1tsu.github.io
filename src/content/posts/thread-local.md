@@ -63,12 +63,17 @@ public class UserInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 从请求头中的Authorization获取token
         String token = request.getHeader("Authorization");
+        // 验证token
         if (!jwtUtil.validateToken(token)) {
             return false;
         }
+        // 解析token获取用户名
         String username = jwtUtil.parseToken(token);
+        // 根据用户名查询数据库获取用户信息
         User user = userService.findByUsername(username);
+        // 将用户信息保存到ThreadLocal中
         UserContextHolder.set(user);
         return true;
     }
