@@ -103,7 +103,7 @@ tags:
 
     这里的uri是直接访问微服务，所以我们需要在微服务的启动类上添加注解`@EnableDiscoveryClient`，让微服务注册到注册中心。
 
-6. 登录校验
+6. 过滤器（登录校验）
 
     登录校验的实现一般都是通过网关的过滤器，我们可以自定义过滤器，在网关中对请求进行处理。
 
@@ -144,6 +144,28 @@ tags:
               filters: # 自定义过滤器
                 - MyFilter
     ```
+
+7. 网关传递信息
+
+    网关可以将请求头、请求参数、请求体等信息传递给后端的单个或多个子服务。它在过滤器中先进行登录校验，再保存信息到请求头从而传递给后端的子服务。而微服务则利用拦截器将请求头中的信息提取出来，进行相应的处理。
+
+    ```java
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        // 获取请求头中的信息
+        ServerHttpRequest request = exchange.getRequest();
+        // 获取Token
+        List<String> headers = request.getHeaders().get("Authorization");
+        token = headers.get(0);
+        Long useId = jwtUtil.parseToken(token);
+        // 传递我们获取到的userId到后端的子服务
+        ServerWebExchange build = exchange.mutate().
+                request(builder -> builder.header("[我们的请求头的名称]", useId)).build();
+        return chain.filter(build);
+    }
+    ```
+
+    这样我们就可以在common模块中创建一个通用的UserInfoInterceptor拦截器（别忘了添加到SpringMVC配置类的拦截器列表中），通过`request.getHeader("[我们的请求头的名称]")`，将请求头中的信息放到ThreadLocal中保存用户信息；或者在特定controller中就通过`@RequestHeader(value = "[我们的请求头的名称]")`来获取网关传过来的信息。
 
 ## 总结
 
