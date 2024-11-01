@@ -9,9 +9,15 @@ tags:
   - Java
 ---
 
-# Spring Boot 常用注解
+# Spring Boot 注解
 
 目前刚入手，也不会ssm的bean那套，听说spring boot只需要会用类的注解就可以，不需要在xml里面配置bean，所以就记录一下常用的注解。资料来自于[JavaGuide](https://javaguide.cn/system-design/framework/spring/spring-common-annotations.html)
+
+## 注解原理
+
+首先，我们需要知道注解都是在**编译期**被 Spring Boot **代理**的，生成注解都需要有一个**管理器**，一般都存放在 JVM 内存当中 nio-x 线程的 ThreadLocal 中，总的来说就是 `@Transactional` 注解被这个对应的 manager 代理了。而 Spring Boot 是通过 AOP 的方式来创建代理对象的，代理则是通过创建一个子类来 extend 它的父类去实现的。
+
+## Spring Boot 常用注解
 
 1. @SpringBootApplication
 这个注解是SpringBoot的核心注解，可以标注在启动类上(会默认加在主类上)，SpringBoot会自动扫描该类所在的包及其子包下所有的类。并且这玩意由三个注解组合而成：

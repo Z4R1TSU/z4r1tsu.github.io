@@ -25,7 +25,9 @@ tags:
 
 3. `@Transactional`注解在什么时候会失效？
 
-   1. Transactional必须用于非public修饰的方法
+    首先，我们需要知道注解都是在编译期被Spring Boot代理的，生成注解都需要有一个管理器，一般都存放在JVM内存当中nio-x线程的ThreadLocal中，总的来说就是Transactional注解被这个对应的manager代理了。而Spring Boot是通过AOP的方式来创建代理对象的，代理则是通过创建一个子类来extend它的父类去实现的。
+
+   1. @Transactional必须用于非public修饰的方法
    2. @Transactional 注解属性 propagation 设置错误
    3. @Transactional 注解属性 rollbackFor 设置错误
    4. 同一个类中方法调用，导致@Transactional失效
