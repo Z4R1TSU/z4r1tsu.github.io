@@ -9,9 +9,19 @@ tags:
   - Java
 ---
 
-# Spring Boot 常用注解
+# Spring Boot 注解
 
 目前刚入手，也不会ssm的bean那套，听说spring boot只需要会用类的注解就可以，不需要在xml里面配置bean，所以就记录一下常用的注解。资料来自于[JavaGuide](https://javaguide.cn/system-design/framework/spring/spring-common-annotations.html)
+
+## 注解原理
+
+Spring Boot 利用 AOP 和 依赖注入（DI） 机制来实现注解驱动的功能，具体地，它是通过以下步骤进行处理的：
+
+1. 扫描注解: Spring Boot 在启动时会扫描所有 Bean 定义，找到被注解标记的类和方法。
+2. 创建动态代理对象: 对于标记了 @Transactional 这样的注解的方法，Spring 会使用动态代理技术生成一个代理对象，对该方法进行拦截。~~一般注解会由在JVM中nio-x线程的ThreadLocal中的管理器给管理~~
+3. 拦截执行: 当该方法被调用时，动态代理对象会拦截方法调用，并在方法执行前执行事务开启操作，并在方法执行后进行事务提交或回滚操作。
+
+## Spring Boot 常用注解
 
 1. @SpringBootApplication
 这个注解是SpringBoot的核心注解，可以标注在启动类上(会默认加在主类上)，SpringBoot会自动扫描该类所在的包及其子包下所有的类。并且这玩意由三个注解组合而成：
