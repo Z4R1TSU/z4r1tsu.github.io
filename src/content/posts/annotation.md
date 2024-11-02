@@ -10,6 +10,7 @@ tags:
 ---
 
 # Spring Boot 注解
+# Spring Boot 注解
 
 目前刚入手，也不会ssm的bean那套，听说spring boot只需要会用类的注解就可以，不需要在xml里面配置bean，所以就记录一下常用的注解。资料来自于[JavaGuide](https://javaguide.cn/system-design/framework/spring/spring-common-annotations.html)
 
