@@ -1,5 +1,5 @@
 ---
-title: "多线程和线程池面试题"
+title: "线程池"
 description: "这是一篇关于 多线程和线程池面试题 的文章。"
 pubDatetime: 2024-10-05
 author: Zari Tsu
