@@ -23,45 +23,23 @@ IO分为三种：BIO, NIO, AIO。
 
     即东西通过socket进来之后，它会先存在一个地方，然后开出另外一个线程用于处理。
 
+    具体来说，程序会在用户空间开辟出一个线程，专门用来向内核当中轮询socket状态。但是不停的轮询，且每次都要切换用户态和内核态的开销，最夸张的是大多数时间socket状态都没变化，这耗费大量无意义的资源。对此的解法就类似于程序给出要轮询的socket的fd（文件描述符），然后由内核来轮询，当有数据到来时，内核才会通知应用程序，将多次切换变成一次，从而提高效率。而 **select** 和 **poll** 的区别就在于前者只能传有限制的fd，而后者可以传无限制数量的fd。而 **epooll** 更厉害，它不需要轮询，是最接近真正异步的一种IO模型。它的做法是利用中断，当网络状态发生变化的时候，网卡认为socket发生变化时，会产生一个中断，用来检测socket变化的红黑树和双向链表会同步变化，添加可连接的fd，从而通知到应用程序。
+
     而它其实又被分为三种：select, poll, epoll。它们都是半个异步，实际上全是轮询实现的。前面两个基本已经被弃用，大多都是epoll了。
 
-    * select: 监视多个输入通道，等待IO事件的发生。具体是使用FD(文件描述符)来实现，这个是操作系统当中提到的概念，然后通过FD去找到被操作的文件，从而进行IO操作。
-    
-    ```python
-    # select 伪代码
-    while True:
-        fds = []
-        getFD(fds)
-        for fd in fds:
-            getEventsByFD(fd)
-            if event == read:
-                readData(fd)
-            elif event == write:
-                writeData(fd)
-    ```
+    * **select**: 监视多个输入通道，等待IO事件的发生。具体是使用FD(文件描述符)来实现，这个是操作系统当中提到的概念，然后通过FD去找到被操作的文件，从而进行IO操作。
 
-    * poll: 监视多个输入通道，等待IO事件的发生，但是比select更加高效。它将FD这个较为底层的概念，使用了一个结构体进行替代。
+    * **poll**: 监视多个输入通道，等待IO事件的发生，但是比select更加高效。它将FD这个较为底层的概念，使用了一个结构体进行替代。
+
+    * **epoll**: 监视多个输入通道，等待IO事件的发生，支持水平触发和边缘触发。不论是select还是poll，它们都无法避免对内容的拷贝，所以epoll采用了内核统一管理的方式，避免了拷贝操作。我们每次只需要向内核提出请求，然后内核就会返回可以处理的文件。
 
     ```python
-    # poll 伪代码
-    while True:
-        structs = LinkedList()
-        getStructs(structs)
-        for struct in structs:
-            getEventsByStruct(struct)
-            if event == read:
-                readData(struct)
-            elif event == write:
-                writeData(struct)
-    ```
-
-    * epoll: 监视多个输入通道，等待IO事件的发生，支持水平触发和边缘触发。不论是select还是poll，它们都无法避免对内容的拷贝，所以epoll采用了内核统一管理的方式，避免了拷贝操作。我们每次只需要向内核提出请求，然后内核就会返回可以处理的文件。
-
-    ```python
-    # epoll 伪代码
-    while True: # epoll使用的不同于前两者的直接遍历，而是采用红黑树进行优化
-        waitFor() # 因为NIO都是阻塞的，需要等待事件处理完毕
-        handleEvents() # 处理事件
+    createServerSocket() // 创建一个ServerSocket
+    bind()               // 绑定地址和端口
+    listen()             // 监听连接
+    epoll_create()       // 创建epoll句柄
+    epoll_ctl()          // 注册监听事件
+    epoll_wait()         // 等待IO事件发生
     ```
 
 * AIO: 异步非阻塞IO，完全异步但是需要系统支持，在Java 7中引入的新特性，提供了一种新的IO模型，可以实现真正的异步非阻塞IO操作。
