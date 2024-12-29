@@ -7,6 +7,7 @@ featured: false
 draft: false
 tags:
   - Interview
+  - Java
 ---
 
 # 线程池
@@ -50,3 +51,18 @@ tags:
 最常见的就是设置合理的 corePoolSize 和 maximumPoolSize。这个要分为 IO 密集型 和 CPU 密集型 两种情况。设置太小，无法完全利用CPU资源，还容易出现线程饥饿或是创建销毁的重操作；设置太大，线程切换开销大，资源浪费，频繁的调度会影响吞吐量。
 
 如果是 IO 密集型的项目，可以适当调大 corePoolSize 和 maximumPoolSize，这样可以提高吞吐量。如果是 CPU 密集型的项目，则可以适当调小 corePoolSize 和 maximumPoolSize，减少线程切换的开销。
+
+### 使用示例
+
+```java
+public static void main(String[] args) {
+  ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 10L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+  // ExecutorService executor = Executors.newFixedThreadPool(5); // 这个跟上面的效果是一样的
+
+  for (int i = 0; i < 10; i++) {
+    executor.execute(() -> {
+      System.out.println(i + " is running");
+    })
+  }
+}
+```
