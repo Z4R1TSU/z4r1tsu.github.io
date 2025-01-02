@@ -1,6 +1,6 @@
 ---
-title: "滑动窗口"
-description: "这是一篇关于 sliding window 算法的文章。看看笔试题中常常出现的滑动窗口算法的套路。"
+title: "双指针和滑动窗口"
+description: "这是一篇关于 double pointer and sliding window 算法的文章。看看笔试题中常常出现的滑动窗口算法的套路。"
 pubDatetime: 2024-09-22
 author: Zari Tsu
 featured: false
@@ -9,7 +9,30 @@ tags:
   - Alogorithm
 ---
 
-# 滑动窗口
+# 双指针和滑动窗口
+
+## 双指针
+
+双指针其实跟滑动窗口类似。它利用遍历数组的某种单调性，使得运行的时间复杂度可以从 O(n ^ 2) 降到 O(n)。
+
+```python
+def double_pointer(nums: List[int], target: int):
+    n = len(nums)
+    buf = {}
+    l = 0
+    res = []
+
+    for r, x in enumerate(nums):
+        while x in buf:
+            buf.pop(nums[l])
+            l += 1
+        buf[x] = r
+        if x == target:
+            res.append(l)
+    return res
+```
+
+## 滑动窗口
 
 一般对于任何题目，都有这样一个模板
 
