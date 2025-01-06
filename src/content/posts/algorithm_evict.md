@@ -94,116 +94,99 @@ python3中的heapq模块提供了堆的实现，默认是小根堆，也就是�
 
 ```python
 class LFU:
+
     def __init__(self, capacity: int):
         self.capacity = capacity
-        self.buf = {}  # 存储键值对
-        self.freq = defaultdict(int)  # 存储每个键的频率
-        self.heap = []  # 优先队列，存储 (频率, 时间戳, 键)
-        self.time = 0  # 时间戳，用于处理频率相同的情况
+        self.buf = {} # {key : value}
+        self.freq = {} # {key : frequency}
+        self.time = 0
+        self.heap = [] # (frequency, timestamp, key)
 
     def get(self, key: int) -> int:
         if key not in self.buf:
             return -1
-        # 更新频率和时间戳
         self.freq[key] += 1
         self.time += 1
         heapq.heappush(self.heap, (self.freq[key], self.time, key))
         return self.buf[key]
 
     def put(self, key: int, value: int) -> None:
-        if self.capacity == 0:
-            return
         if key in self.buf:
             self.buf[key] = value
             self.freq[key] += 1
             self.time += 1
             heapq.heappush(self.heap, (self.freq[key], self.time, key))
         else:
-            if len(self.buf) >= self.capacity:
-                # 移除最小频率的键
-                while self.heap:
-                    f, t, k = heapq.heappop(self.heap)
-                    if k in self.buf and self.freq[k] == f:
-                        del self.buf[k]
-                        del self.freq[k]
-                        break
-            self.buf[key] = value
+            while len(self.buf) >= self.capacity and self.heap:
+                f, t, k = heapq.heappop(self.heap)
+                if f == self.freq[k] and k in self.buf:
+                    del self.buf[k]
+                    del self.freq[k]
+                    break
             self.freq[key] = 1
             self.time += 1
+            self.buf[key] = value
             heapq.heappush(self.heap, (self.freq[key], self.time, key))
 ```
 
-接下来O(1)时间复杂度的方法，类似于上面讲过的LRU算法，利用的也是双向链表和哈希表的组合。
+接下来O(1)时间复杂度的方法，类似于上面讲过的LRU算法，利用的也是双向链表和哈希表的组合。它会将同样使用频率的节点组成一个类似LRU中的双向连表结构，然后优先逐出频率最低的链表节点，再选择出其中最久未使用的节点，也就是`sentinel.next`节点。
 
 ```python
 class Node:
-    def __init__(self, key=0, val=0, pre=None, nxt=None):
+    def __init__(self, key=0, value=0, pre=None, nxt=None, freq=0):
         self.key = key
-        self.val = val
+        self.val = value
         self.pre = pre
         self.nxt = nxt
+        self.freq = freq
 
 class LFUCache:
+
     def __init__(self, capacity: int):
         self.capacity = capacity
-        self.buf = {}  # 存储键值对
-        self.freq = {}  # 存储每个键的使用频率
-        self.freq_to_keys = {}  # 存储每个频率对应的键的链表
-        self.min_freq = 0  # 当前最小频率
+        self.buf = {} # {frequency : LRU linked list}
+        self.dt = {} # {key : node}
 
     def get(self, key: int) -> int:
-        if key not in self.buf:
+        if key not in self.dt:
             return -1
-        # 更新频率
-        self.update_freq(key)
-        return self.buf[key].val
+        cur_node = self.dt[key]
+        cur_value = cur_node.val
+        cur_freq = cur_node.freq
+        self.remove(cur_node)
+        self.insert(key, cur_value, cur_freq + 1)
+        return cur_value
 
     def put(self, key: int, value: int) -> None:
-        if self.capacity == 0:
-            return
-        if key in self.buf:
-            self.buf[key].val = value
-            self.update_freq(key)
+        if key not in self.dt:
+            if len(self.dt) >= self.capacity:
+                # 寻找频率最低的链表节点，当然这里也可以在类中维护一个最小使用频率的变量，以便于直接找到要删除节点所在的链表
+                for i in range(1000):
+                    if i in self.buf:
+                        delete_node = self.buf[i].nxt
+                        if delete_node != self.buf[i]:
+                            self.remove(delete_node)
+                            break
+            self.insert(key, value, 1)
         else:
-            if len(self.buf) >= self.capacity:
-                self.remove_min_freq_key()
-            self.buf[key] = Node(key, value)
-            self.freq[key] = 1
-            if 1 not in self.freq_to_keys:
-                self.freq_to_keys[1] = Node(-1, -1)
-                self.freq_to_keys[1].pre = self.freq_to_keys[1].nxt = self.freq_to_keys[1]
-            self.insert_node(self.freq_to_keys[1], self.buf[key])
-            self.min_freq = 1
+            cur_node = self.dt[key]
+            cur_freq = cur_node.freq
+            self.remove(cur_node)
+            self.insert(key, value, cur_freq + 1)
 
-    def update_freq(self, key: int) -> None:
-        freq = self.freq[key]
-        self.freq[key] += 1
-        # 从原频率链表中移除
-        self.remove_node(self.buf[key])
-        # 如果原频率链表为空，且原频率是最小频率，则更新最小频率
-        if self.freq_to_keys[freq].nxt == self.freq_to_keys[freq]:
-            del self.freq_to_keys[freq]
-            if freq == self.min_freq:
-                self.min_freq += 1
-        # 插入到新频率链表中
-        if freq + 1 not in self.freq_to_keys:
-            self.freq_to_keys[freq + 1] = Node(-1, -1)
-            self.freq_to_keys[freq + 1].pre = self.freq_to_keys[freq + 1].nxt = self.freq_to_keys[freq + 1]
-        self.insert_node(self.freq_to_keys[freq + 1], self.buf[key])
+    def insert(self, key: int, value: int, freq: int) -> None:
+        if freq not in self.buf:
+            self.buf[freq] = sentinel = Node(-1, -1)
+            new_node = Node(key, value, sentinel, sentinel, freq)
+            sentinel.pre, sentinel.nxt = new_node, new_node
+        else:
+            sentinel = self.buf[freq]
+            new_node = Node(key, value, sentinel.pre, sentinel, freq)
+            sentinel.pre.nxt, sentinel.pre = new_node, new_node
+        self.dt[key] = new_node
 
-    def remove_min_freq_key(self) -> None:
-        min_freq_list = self.freq_to_keys[self.min_freq]
-        node_to_remove = min_freq_list.nxt
-        self.remove_node(node_to_remove)
-        del self.buf[node_to_remove.key]
-        del self.freq[node_to_remove.key]
-        if min_freq_list.nxt == min_freq_list:
-            del self.freq_to_keys[self.min_freq]
-
-    def remove_node(self, node: Node) -> None:
+    def remove(self, node: Node) -> None:
+        cur_key = node.key
         node.pre.nxt, node.nxt.pre = node.nxt, node.pre
-
-    def insert_node(self, head: Node, node: Node) -> None:
-        node.pre, node.nxt = head.pre, head
-        head.pre.nxt, head.pre = node, node
+        del self.dt[cur_key]
 ```
