@@ -66,3 +66,28 @@ List<Integer> result = newList.stream()
    })
   .collect(Collectors.toList());
 ```
+
+## 规约
+
+在阿里巴巴开发规范当中，也对stream流中的部分方法进行了规约。
+
+对于toMap操作，我们必须使用三个参数的输入，第三个用来处理重复key的情况。一旦出现重复key的情况，会抛出 IllegalStateException 异常，这是因为默认情况下，toMap 方法不允许键重复。
+
+```java
+// 假设我们的需求是将一些Person对象转换为Map对象
+public class Person {
+    private String name;
+    private int age;
+}
+
+public static void main(String[] args) {
+    List<Person> persons = Arrays.asList(new Person("Alice", 20), new Person("Bob", 25), new Person("Charlie", 30));
+
+    Map<String, Integer> map = persons.stream()
+        .collect(Collectors.toMap(
+            Person::getName, 
+            Person::getAge, 
+            (existingValue, newValue) -> newValue // 合并函数：保留新的值
+        ));
+}
+```
