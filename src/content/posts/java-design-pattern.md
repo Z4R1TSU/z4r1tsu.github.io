@@ -148,6 +148,7 @@ public enum FileType {
     EXCEL("excel", ExcelExporter.class);
     // 之后如果有更多的导出格式，可以继续通过添加(格式名, 实现类)的形式添加到枚举类中
     private String type;
+    private final Class<? extends Exporter> exporterClass;
 }
 
 public class ExporterFactory {
@@ -180,5 +181,140 @@ public static void main(String[] args) {
     FileType fileType = FileType.getByType(filePath.substring(filePath.lastIndexOf(".") + 1));
     Exporter exporter = ExporterFactory.getExporter(fileType);
     exporter.export(filePath);
+}
+```
+
+## 门面模式
+
+门面模式的主要作用是用来简化客户端代码的使用，隐藏内部的复杂逻辑，让客户端只需要调用一个方法，就能完成整个功能，相当于客户端和内部的实现类之间的一个封装层。
+
+毕竟我们想要更深层次的封装，单纯出于想导出某个文件的目的，其实我们并不需要知道内部的实现逻辑，应该只调用一个接口就可以了。
+
+具体地，我们可以创建一个 ExportClient 类，作为门面类，负责对外提供一个 export 方法，并在内部调用具体的 Exporter 实现类的 export 方法。
+
+```java
+public class ExportClient {
+    public static void export(String filePath) {
+        String fileType = filePath.substring(filePath.lastIndexOf(".") + 1);
+        Exporter exporter = ExporterFactory.getExporter(FileType.getByType(fileType));
+        exporter.export(filePath);
+    }
+    // 处理其他导出逻辑
+    public static void export(String filePath, FileType fileType) {
+        Exporter exporter = ExporterFactory.getExporter(fileType);
+        exporter.export(filePath);
+    }
+    // 处理文件对象导出逻辑
+    public static void export(File file) {
+        String filePath = file.getAbsolutePath();
+        export(filePath);
+    }
+}
+
+// 接口类、抽象类、实现类均不需要变动...
+
+// 那么现在我们只需要调用 ExportClient 类的单个 export 方法，就可以完成导出功能了。
+public static void main(String[] args) {
+    String filePath = "xxx.csv";
+    ExportClient.export(filePath);
+}
+```
+
+## 单例模式
+
+单例模式的主要作用是确保某个类只有一个实例存在，并且提供一个全局访问点。即当我们进行类似 `getInstance()` 方法的调用时，始终返回同一个对象。
+
+其实单例模式的设计已经融合在我们之前的设计模式中了，往往实际要提如何单纯实现单例模式其实比较麻烦，需要靠记忆。
+
+```java
+public class Singleton {
+    public static final Singleton INSTANCE = new Singleton();
+
+    private Singleton() {
+    }
+
+    public static Singleton getInstance() {
+        return INSTANCE;
+    }
+}
+```
+
+## 与Spring结合
+
+之前我们讲的都是用maven项目来演示设计模式，但实际上，Spring框架中的 IOC 容器、AOP 等功能，都可以帮助我们更优雅、更方便地实现设计模式。
+
+在Spring Boot当中，我们会将类放到IOC容器中，并通过注解来配置，这样就可以通过 `@Autowired` 注解来注入依赖，而不需要在代码中手动创建对象。但对于这种有多个类型对应多个实例对象的情况，Spring就不知道要导入哪个特定的实现类，如果用接口类型来注入也不对。所以，我们需要结合Spring的特性，结合其提供的各种注解与工厂，自定义一个工厂来实现。
+
+首先，我们在注入时，我们要将具体策略实现类通过`@Component`注解，加入到IOC容器中。注入了还不够，我们还需要具体文件类型和相应实现类实例对象的映射关系，于是我们在工厂类中，通过遍历枚举类，将对应映射关系集注入到IOC容器中。最后是使用时，通过`@Autowired`注解
+
+```java
+// 注入文件类型名和具体实例对象到IOC容器
+@Component
+public class ExporterFactory {
+    private final ApplicationContext applicationContext;
+    private Map<FileType, Exporter> exporterMap;
+
+    @Autowired
+    public ExporterFactory(ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    @PostConstruct
+    public void init() {
+        exporterMap = Arrays.stream(FileType.values())
+            .collect(Collectors.toMap(
+                Function.identity(),
+                fileType -> {
+                    try {
+                        return applicationContext.getBean(fileType.getExporterClass());
+                    } catch (BeansException e) {
+                        throw new RuntimeException("Failed to create Exporter for type: " + fileType, e);
+                    }
+                }
+            ));
+    }
+
+    public Exporter getExporter(FileType fileType) {
+        if (!exporterMap.containsKey(fileType)) {
+            throw new IllegalArgumentException("不支持的文件类型：" + fileType);
+        }
+        return exporterMap.get(fileType);
+    }
+}
+
+// 具体实现类上添加注解以加入到IOC容器
+@Component
+public class CSVExporter implements Exporter {
+    // 具体实现代码
+}
+
+@Component
+public class ExcelExporter implements Exporter {
+    // 具体实现代码
+}
+
+// Interface类不需要变化...
+
+@Component
+public class ExportClient {
+    @Autowired
+    private ExporterFactory exporterFactory;
+
+    public void export(String filePath) {
+        String fileType = filePath.substring(filePath.lastIndexOf(".") + 1);
+        Exporter exporter = exporterFactory.getExporter(FileType.getByType(fileType));
+        exporter.export(filePath);
+    }
+}
+
+// 使用时，通过注解注入依赖，并调用其 export 方法
+public static void main(String[] args) {
+    @Autowired
+    private ExportClient exportClient;
+
+    public static void main(String[] args) {
+        String filePath = "xxx.csv";
+        exportClient.export(filePath);
+    }
 }
 ```
