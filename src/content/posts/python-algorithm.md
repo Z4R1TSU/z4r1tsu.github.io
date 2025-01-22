@@ -1,5 +1,5 @@
 ---
-title: "Python的输入处理"
+title: "Python的输入输出处理"
 description: "这是一篇关于使用 Python 进行面试中的手撕部分时，涉及到的 处理输入输出 的文章。"
 pubDatetime: 2025-01-22
 author: Zari Tsu
@@ -10,7 +10,7 @@ tags:
   - Interview
 ---
 
-# Python 的输入处理
+# Python 的输入输出处理
 
 面试中的手撕——算法题或者是设计题，采用的是 ACM 的形式，即自己处理输入输出。而我们这些在力扣舒适圈待久了的人，这其实是比较陌生的，为了上战场时候的懵逼，我准备先演习一遍。
 
@@ -43,6 +43,10 @@ tags:
 5. **isnumeric()**:  
    [https://docs.python.org/3/library/stdtypes.html#str.isnumeric](https://docs.python.org/3/library/stdtypes.html#str.isnumeric)  
    这个函数是用来判断字符串是否只包含数字和 `.`，返回 `True` 或 `False`。
+6. **join()**:  
+   [https://docs.python.org/3/library/stdtypes.html#str.join](https://docs.python.org/3/library/stdtypes.html#str.join)  
+   这个函数是用来处理输出的，可以连接字符串，返回一个 `str` 类型。括号里面加一个 `list` 类型参数，用来指定连接的字符。
+   如 `', '.join(['1', '2', '3'])` 就可以返回 `1, 2, 3`，`''.join(['1', '2', '3'])` 就可以返回 `'123'`。
 
 ## 单行
 
