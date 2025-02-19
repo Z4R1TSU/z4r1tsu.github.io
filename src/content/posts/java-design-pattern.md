@@ -233,7 +233,16 @@ public class Singleton {
     private Singleton() {
     }
 
-    public static Singleton getInstance() {
+    // 懒汉式：线程不安全
+    public static Singleton getInstance1() {  
+        if (instance == null) {  
+            instance = new Singleton();  
+        }  
+        return instance;  
+    }
+
+    // 饿汉式：最常用的办法，但容易产生垃圾对象
+    public static Singleton getInstance2() {
         return INSTANCE;
     }
 }
