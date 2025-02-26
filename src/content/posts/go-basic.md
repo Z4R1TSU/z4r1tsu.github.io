@@ -11,7 +11,7 @@ tags:
 
 # Go Basic
 
-Golang 是由 Google 开发的，一门注重性能的静态强类型语言。其显著特点有这几点：变量名在前而变量类型在后；强调高性能和轻量（goroutine协程提供高效的并发能力）；基于 Go Modules 的项目依赖管理；严格的 Exception Handling，需要程序员当场处理异常而非层层上推。
+Golang 是由 Google 开发的，一门**值传递**的**静态强类型**语言。其显著特点有这几点：变量名在前而变量类型在后；强调高性能和轻量（goroutine协程提供高效的并发能力）；基于 Go Modules 的项目依赖管理；严格的 Exception Handling，需要程序员当场处理异常而非层层上推。
 
 ## 变量创建
 
@@ -146,6 +146,44 @@ arr4 := [...]int{1, 2, 3, 4, 5}
         fmt.Println(key, value)
     }
     ```
+
+## 类型转换
+
+### 类型转换
+
+> type(variable)
+
+除去现成的库转换函数外，最底层的实现应该都是依赖于上述格式的转换
+
+```go
+// 将二进制数据转换为字符串类型
+greeting := []byte("hello world")
+greetingStr := string(greeting)
+```
+
+### 类型断言
+
+> variable.(type)
+
+类型断言一般需要加入接口 `interface{}` 来代替未知类型（可以理解为 `void*`？）
+
+```go
+var greeting interface{} = "hello world"
+greetingStr, ok := greeting.(string)
+```
+
+为了高效区分变量多种类型，我们可以使用 `type-switch`
+
+```go
+switch x := i.(type) {
+case int:
+    fmt.Println(x, "is int")
+case string:
+    fmt.Println(x, "is string")
+default:
+    fmt.Println("unknown type")
+}
+```
 
 ## 控制语句
 
