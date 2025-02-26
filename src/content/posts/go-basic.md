@@ -38,6 +38,18 @@ age1, age2 := 10, 20
 age1, age2 = age2, age1
 ```
 
+### new
+
+> `func new(Type) *Type`
+
+new 关键词：需要我们传入一个类型，返回一个指针，指向该类型的对象。在此过程中，它会先分配内存（brk类似的系统调用），再将分配的内存置零（懒操作的思想），返回指针（注意不是对象本身）
+
+### make
+
+> `func make(t Type, size ...IntegerType) Type`
+
+make 关键词：用于 slice, map, chan 这特定三种类型的内存分配和初始化。注意此处的初始化并非置零，返回值也并非是指针，而是对象的引用（对象本身）
+
 ## 数据类型
 
 ### byte
