@@ -107,4 +107,44 @@ func main() {
 
 ## 反射 Reflection
 
-Java 中的反射一般用于通过类的名字，以字符串的方式来获取类对象。而 Golang 中的反射则让我们拥有了获取一个对象的类型，属性及方法的能力
+Java 中的反射一般用于通过类的名字，以字符串的方式来获取类对象。而 Golang 中的反射则让我们拥有了获取一个对象的类型、属性及方法的能力
+
+```go
+// 创建对象
+type T int
+var x T
+// 获取对象类型
+xType := reflect.TypeOf(x)
+// 获取对象值
+xValue := reflect.ValueOf(x)
+v.Type() // 得到直接类型 T
+v.Kind() // 得到底层类型 int
+```
+
+```go
+type Person struct {
+    Name string
+    Age int
+}
+
+func (p *Person) setAge(age int) {
+    p.Age = age
+}
+
+func main() {
+    zari := Person{Name: "zari", Age: 21}
+    zariType := reflect.TypeOf(zari)
+    zariType.Name() // Person
+    zariType.Kind() // struct
+    zariValue := reflect.ValueOf(zari)
+    zariValue.Type() // Person
+    zariValue.Kind() // struct
+    // 获取对象属性和方法（Person类含两个属性，因此循环次数为2）
+    for i := 0; i < zariValue.NumField(); i++ {
+        field := zariValue.Field(i) // 获取属性
+        fieldName := zariType.Field(i).Name // 获取属性名(Name, Age)
+        fieldType := zariType.Field(i).Type // 获取属性类型(string, int)
+        fieldValue := field.Interface()     // 获取属性值(zari, 21)
+    }
+}
+```
