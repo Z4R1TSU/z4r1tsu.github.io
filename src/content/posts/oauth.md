@@ -1,7 +1,7 @@
 ---
 title: "OAuth2.0"
 description: ""
-pubDatetime: 2024-12-09
+pubDatetime: 2025-03-22
 author: Zari Tsu
 featured: false
 draft: false
