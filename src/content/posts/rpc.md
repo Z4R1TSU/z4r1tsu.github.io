@@ -1,5 +1,5 @@
 ---
-title: "Kitex"
+title: "RPC"
 description: "这是一篇关于 Kitex 这一用于 Go 语言的 RPC 框架的文章。"
 pubDatetime: 2025-02-20
 author: Zari Tsu
@@ -9,7 +9,7 @@ tags:
   - Go
 ---
 
-# Kitex
+# RPC
 
 Kitex 是字节跳动开源的高性能、强可扩展性的 Go RPC 框架。RPC （Remote Procedure Call，远程过程调用）是一种通过网络从远程计算机上请求服务的技术，使得外显地对一个远程服务的调用就像调用本地函数一样。
 
